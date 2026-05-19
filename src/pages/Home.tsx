@@ -78,25 +78,38 @@ export function Home() {
         </div>
       </header>
 
-      {/* Search Area */}
-      <section className="w-full max-w-[800px] mx-auto px-4 mb-8 mt-2 relative z-10">
-        <form onSubmit={handleSearch} className="relative flex items-center w-full h-[52px] bg-white rounded-[20px] shadow-[0_4px_24px_rgba(29,111,143,0.06)] border border-transparent focus-within:border-[#1D6F8F]/40 transition-all duration-300">
-          <Search className="absolute left-5 w-[18px] h-[18px] text-[#6C8EA0]" />
-          <input 
-            type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="请输入线路、站点或目的地..."
-            className="w-full h-full pl-[46px] pr-[110px] bg-transparent text-[#1A2C3E] placeholder:text-[#6C8EA0]/60 text-sm outline-none rounded-[20px]"
+      {/* Hero & Search Area */}
+      <section className="w-full max-w-[1280px] mx-auto px-4 lg:px-8 mb-8 mt-2">
+        <div className="relative w-full h-[240px] md:h-[300px] rounded-[32px] overflow-hidden flex flex-col items-center justify-center p-6 bg-[#1A2C3E] shadow-[0_8px_32px_rgba(29,111,143,0.15)]">
+          <div 
+            className="absolute inset-0 z-0 bg-cover bg-[center_35%] bg-no-repeat opacity-60 mix-blend-luminosity"
+            style={{ backgroundImage: 'url(/tiantan.jpg)' }}
           />
-          <button 
-            type="button"
-            onClick={() => navigate('/search')}
-            className="absolute right-2 px-4 h-9 bg-[#F5F8FC] hover:bg-[#E8EEF4] text-[#1D6F8F] text-[13px] font-medium rounded-[12px] flex items-center transition-colors shadow-sm"
-          >
-            高级检索
-          </button>
-        </form>
+          <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#0F1C2A]/90 via-[#1D6F8F]/40 to-transparent"></div>
+          
+          <div className="relative z-10 w-full max-w-[800px] flex flex-col items-center pt-8">
+            <h2 className="text-white text-2xl md:text-3xl font-bold mb-6 tracking-wide drop-shadow-md">
+              畅游京城，智慧出行
+            </h2>
+            <form onSubmit={handleSearch} className="relative flex items-center w-full h-[56px] md:h-[60px] bg-white/95 backdrop-blur-md rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.1)] border border-white/20 focus-within:bg-white focus-within:shadow-[0_8px_32px_rgba(29,111,143,0.2)] transition-all duration-300">
+              <Search className="absolute left-6 w-[20px] h-[20px] text-[#1D6F8F]" />
+              <input 
+                type="text"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="请输入线路、站点或目的地..."
+                className="w-full h-full pl-[56px] pr-[120px] bg-transparent text-[#1A2C3E] placeholder:text-[#6C8EA0]/80 text-[15px] outline-none rounded-[24px]"
+              />
+              <button 
+                type="button"
+                onClick={() => navigate('/search')}
+                className="absolute right-2 px-5 h-11 bg-gradient-to-r from-[#1D6F8F] to-[#2B92BA] text-white text-[14px] font-medium rounded-[18px] flex items-center transition-transform hover:scale-[1.02] shadow-sm"
+              >
+                高级检索
+              </button>
+            </form>
+          </div>
+        </div>
       </section>
 
       {/* KPI Cards (Core Data Dashboard) */}
