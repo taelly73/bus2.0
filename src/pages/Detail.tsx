@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Tag, ExternalLink, CalendarDays, Bus, Printer } from 'lucide-react';
+import { ArrowLeft, Clock, Tag, ExternalLink, CalendarDays, Bus, Printer, Loader2 } from 'lucide-react';
 import { getBusData } from '../lib/dataParser';
 
 export const Detail = () => {
@@ -8,6 +8,38 @@ export const Detail = () => {
   const navigate = useNavigate();
   const data = getBusData();
   const item = data.find(d => d.id === id);
+  const [fetchedContent, setFetchedContent] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (item && !item.content && item.url) {
+      setLoading(true);
+      setError(false);
+      fetch(`/api/article?url=${encodeURIComponent(item.url)}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch");
+          return res.json();
+        })
+        .then(data => {
+          if (data.html) {
+            // we use html to preserve formatting such as paragraphs
+            setFetchedContent(data.html); 
+          } else if (data.content) {
+            setFetchedContent(data.content);
+          } else {
+            setError(true);
+          }
+        })
+        .catch(e => {
+          console.error(e);
+          setError(true);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [item]);
 
   if (!item) {
     return (
@@ -70,7 +102,29 @@ export const Detail = () => {
             <div className="flex-1 text-[15px] md:text-base leading-[1.8] text-[#1A2C3E] relative z-10 text-justify">
               {item.content ? (
                 <div className="whitespace-pre-wrap break-words">{item.content}</div>
+              ) : loading ? (
+                <div className="text-[#6C8EA0] flex flex-col items-center justify-center py-16 bg-[#F5F8FC] rounded-2xl border border-[#E8EEF4] border-dashed">
+                   <Loader2 className="w-8 h-8 mb-3 text-[#1D6F8F] animate-spin" />
+                   <p className="font-medium">正在获取正文记录...</p>
+                </div>
+              ) : fetchedContent ? (
+                <div className="whitespace-pre-wrap break-words format-html" dangerouslySetInnerHTML={{ __html: fetchedContent }} />
+              ) : error ? (
+                <div className="text-[#6C8EA0] flex flex-col items-center justify-center p-8 md:py-16 bg-[#F5F8FC] rounded-2xl border border-[#E8EEF4] border-dashed">
+                   <ExternalLink className="w-10 h-10 mb-4 opacity-40 text-[#1D6F8F]" />
+                   <p className="font-medium text-base mb-2 text-[#1A2C3E]">系统无法直接提取该页面的正文</p>
+                   <p className="text-sm text-[#6C8EA0] mb-6">由于源站的安全策略限制，当前页面无法直接显示。</p>
+                   <a 
+                     href={item.url} 
+                     target="_blank" 
+                     rel="noopener noreferrer" 
+                     className="px-6 py-3 bg-[#1D6F8F] text-white rounded-xl text-sm font-bold hover:bg-[#155973] transition-colors shadow-sm flex items-center"
+                   >
+                     前往官网查看原文详情 <ExternalLink className="w-4 h-4 ml-2" />
+                   </a>
+                </div>
               ) : (
+
                 <div className="text-[#6C8EA0] flex flex-col items-center justify-center py-16 bg-[#F5F8FC] rounded-2xl border border-[#E8EEF4] border-dashed">
                    <ExternalLink className="w-8 h-8 mb-3 opacity-40 text-[#1D6F8F]" />
                    <p className="font-medium">暂无详细正文记录，请点击上方链接查看原文</p>
