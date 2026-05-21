@@ -213,7 +213,7 @@ export function Home() {
            </div>
            
            <div className="bg-white rounded-2xl shadow-[0_2px_16px_rgba(29,111,143,0.03)] border border-[#E8EEF4] flex flex-col overflow-hidden">
-              {leftColumnData.slice(0, 5).map(item => (
+              {leftColumnData.map(item => (
                 <div 
                   key={item.id} 
                   onClick={() => navigate(`/detail/${item.id}`)} 
@@ -262,9 +262,9 @@ export function Home() {
               </div>
 
               <div className="flex flex-col space-y-6">
-                {rightColumnData.slice(0, 5).map((item, idx) => (
+                {rightColumnData.map((item, idx) => (
                   <div key={item.id} onClick={() => navigate(`/detail/${item.id}`)} className="flex items-start space-x-4 cursor-pointer group relative">
-                     {idx !== rightColumnData.slice(0, 5).length - 1 && (
+                     {idx !== rightColumnData.length - 1 && (
                        <div className="absolute left-[3.5px] top-[14px] bottom-[-24px] w-[2px] bg-[#F5F8FC]"></div>
                      )}
                      <div className="w-[9px] h-[9px] rounded-full bg-[#1D6F8F] mt-[6px] flex-shrink-0 relative z-10 ring-4 ring-white shadow-sm"></div>
