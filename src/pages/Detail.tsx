@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, CalendarDays, Bus, Printer } from 'lucide-react';
+import { ArrowLeft, ExternalLink, CalendarDays, Bus, Printer, Sparkles } from 'lucide-react';
 import { getBusData } from '../lib/dataParser';
+import ReactMarkdown from 'react-markdown';
 
 export const Detail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const data = getBusData();
   const item = data.find(d => d.id === id);
+
+  const [aiSummary, setAiSummary] = useState<string>('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
   if (!item) {
     return (
@@ -19,6 +23,29 @@ export const Detail = () => {
     </div>
     );
   }
+
+  const handleAiSummarize = async () => {
+    if (aiSummary || isAiLoading) return;
+    setIsAiLoading(true);
+    try {
+      const res = await fetch('/api/ai/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+           title: item.title,
+           content: item.content || '未提供正文详情'
+        })
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'AI summarization failed');
+      setAiSummary(result.text);
+    } catch (e: any) {
+      console.error(e);
+      setAiSummary(e.message || '抱歉，此公告暂无法提供 AI 总结。');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F8FC] font-sans text-[#1A2C3E] pb-24 selection:bg-[#1D6F8F] selection:text-white">
@@ -33,6 +60,16 @@ export const Detail = () => {
               <span className="w-1.5 h-4 bg-[#1D6F8F] rounded mr-2.5"></span>
               公示详情
             </h1>
+          </div>
+          <div>
+             <button 
+                onClick={handleAiSummarize} 
+                disabled={isAiLoading || !!aiSummary}
+                className="px-4 py-1.5 bg-[#1D6F8F] hover:bg-[#155A75] text-white rounded-full text-sm font-medium transition-colors shadow-sm flex items-center disabled:opacity-50"
+              >
+                <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                {isAiLoading ? '总结中...' : '生成 AI 总结摘要'}
+             </button>
           </div>
         </div>
       </header>
@@ -66,6 +103,25 @@ export const Detail = () => {
                 )}
               </div>
             </div>
+
+            {/* AI Summary Block */}
+            {(aiSummary || isAiLoading) && (
+              <div className="mb-8 p-6 bg-[#F5F8FC] border border-[#E8EEF4] rounded-2xl relative z-10 shadow-inner">
+                 <h3 className="flex items-center text-[#1D6F8F] font-bold text-[15px] mb-3">
+                   <Sparkles className="w-4 h-4 mr-2" />
+                   AI 智能摘要
+                 </h3>
+                 <div className="text-[14px] text-[#1A2C3E] leading-[1.7]">
+                   {isAiLoading ? (
+                     <span className="text-[#6C8EA0] animate-pulse">DeepSeek 正在阅读公告全文，提炼核心信息...</span>
+                   ) : (
+                     <div className="markdown-body">
+                       <ReactMarkdown>{aiSummary}</ReactMarkdown>
+                     </div>
+                   )}
+                 </div>
+              </div>
+            )}
             
             <div className="flex-1 text-[15px] md:text-base leading-[1.8] text-[#1A2C3E] relative z-10 text-justify">
               {item.content ? (

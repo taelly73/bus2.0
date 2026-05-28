@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bus, Bell, RefreshCw, Calendar, ChevronRight, CalendarDays, Activity, Info, PlusCircle, ArrowRight, XCircle } from 'lucide-react';
 import { getBusData } from '../lib/dataParser';
@@ -37,7 +37,7 @@ export function Home() {
     }, {} as Record<string, number>);
 
     return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
       .map(([name, count]) => ({ name, count }));
   }, [data]);
 
@@ -66,9 +66,9 @@ export function Home() {
       <header className="w-full max-w-[1280px] mx-auto px-4 lg:px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col">
            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#1D6F8F] to-[#2B92BA] bg-clip-text text-transparent flex items-center tracking-wide">
-             北京公交
+             AI 智能公交检索系统
            </h1>
-           <span className="text-[10px] text-[#6C8EA0] tracking-[0.2em] uppercase mt-0.5">Beijing Public Transport</span>
+           <span className="text-[10px] text-[#6C8EA0] tracking-[0.2em] uppercase mt-0.5">AI-Based Transit Information Retrieval</span>
         </div>
         <div className="self-start md:self-auto flex items-center text-xs font-medium text-[#6C8EA0] bg-white px-4 py-2 rounded-full shadow-[0_2px_8px_rgba(29,111,143,0.06)] border border-[#E8EEF4]">
           <span className="flex items-center">
@@ -89,7 +89,7 @@ export function Home() {
           
           <div className="relative z-10 w-full max-w-[800px] flex flex-col items-center pt-8">
             <h2 className="text-white text-2xl md:text-3xl font-bold mb-6 tracking-wide drop-shadow-md">
-              畅游京城，智慧出行
+              AI智能信息检索，让出行更智慧
             </h2>
             <form onSubmit={handleSearch} className="relative flex items-center w-full h-[56px] md:h-[60px] bg-white/95 backdrop-blur-md rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.1)] border border-white/20 focus-within:bg-white focus-within:shadow-[0_8px_32px_rgba(29,111,143,0.2)] transition-all duration-300">
               <Search className="absolute left-6 w-[20px] h-[20px] text-[#1D6F8F]" />
@@ -97,17 +97,27 @@ export function Home() {
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="请输入线路、站点或目的地..."
+                placeholder="你可以问我：“五一期间哪些公交改道了” 或 “我想去天坛，有影响吗”..."
                 className="w-full h-full pl-[56px] pr-[120px] bg-transparent text-[#1A2C3E] placeholder:text-[#6C8EA0]/80 text-[15px] outline-none rounded-[24px]"
               />
               <button 
                 type="button"
-                onClick={() => navigate('/search')}
+                onClick={() => navigate(`/search?q=${encodeURIComponent(query.trim())}&mode=ai`)}
                 className="absolute right-2 px-5 h-11 bg-gradient-to-r from-[#1D6F8F] to-[#2B92BA] text-white text-[14px] font-medium rounded-[18px] flex items-center transition-transform hover:scale-[1.02] shadow-sm"
               >
-                高级检索
+                AI 查询
               </button>
             </form>
+            
+            <div className="mt-5 flex gap-3">
+              <button 
+                onClick={() => navigate('/realtime')}
+                className="px-5 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white rounded-full text-[13px] font-medium transition flex items-center shadow-sm"
+              >
+                <Bus className="w-4 h-4 mr-1.5" />
+                实时公交查询
+              </button>
+            </div>
           </div>
         </div>
       </section>
